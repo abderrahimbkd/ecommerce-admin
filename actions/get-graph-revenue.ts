@@ -5,9 +5,7 @@ interface GraphData {
   total: number;
 }
 
-export const getGraphRevenue = async (
-  storeId: string
-): Promise<GraphData[]> => {
+export const getGraphRevenue = async (storeId: string): Promise<GraphData[]> => {
   const paidOrders = await prismadb.order.findMany({
     where: {
       storeId,
@@ -30,12 +28,11 @@ export const getGraphRevenue = async (
     let revenueForOrder = 0;
 
     for (const item of order.orderItems) {
-      revenueForOrder += item.product.price.toNumber();
+      revenueForOrder += item.product.price;
     }
 
     // Adding the revenue for this order to the respective month
-    monthlyRevenue[month] =
-      (monthlyRevenue[month] || 0) + revenueForOrder;
+    monthlyRevenue[month] = (monthlyRevenue[month] || 0) + revenueForOrder;
   }
 
   // Converting the grouped data into the format expected by the graph
@@ -56,8 +53,7 @@ export const getGraphRevenue = async (
 
   // Filling in the revenue data
   for (const month in monthlyRevenue) {
-    graphData[parseInt(month)].total =
-      monthlyRevenue[parseInt(month)];
+    graphData[parseInt(month)].total = monthlyRevenue[parseInt(month)];
   }
 
   return graphData;
